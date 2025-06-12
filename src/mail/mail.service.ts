@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
@@ -26,8 +31,13 @@ export class MailService {
       },
     });
   }
-  async sendOtpVerification(email: string) {
+  async sendOtpVerification(email: string, isUser: boolean) {
     if (!email) throw new ForbiddenException('Email is required');
+
+    if (isUser) {
+      const existUser = await this.userModel.findOne({ email });
+      if (!existUser) throw new UnauthorizedException('User not found with this email!');
+    }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
     const salt = await genSalt(10);
