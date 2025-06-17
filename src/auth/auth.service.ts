@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
   async register(dto: RegisterAuthDto) {
     const existUser = await this.isExistUser(dto.email);
-    if (existUser) throw new BadRequestException('User with this email already exists!');
+    if (existUser) throw new BadRequestException('already_exist');
 
     const salt = await genSalt(10);
     const passwordHash = await hash(dto.password, salt);
@@ -33,10 +33,10 @@ export class AuthService {
 
   async login(dto: LoginAuthDto) {
     const existUser = await this.isExistUser(dto.email);
-    if (!existUser) throw new BadRequestException('User with this email does not exist!');
+    if (!existUser) throw new BadRequestException('user_not_found');
     if (dto.password.length) {
       const currentPassword = await compare(dto.password, existUser.password);
-      if (!currentPassword) throw new BadRequestException('Incorrect password!');
+      if (!currentPassword) throw new BadRequestException('incorrect_password');
     }
 
     const token = await this.issueTokenPair(String(existUser._id));

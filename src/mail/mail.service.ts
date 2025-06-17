@@ -32,11 +32,11 @@ export class MailService {
     });
   }
   async sendOtpVerification(email: string, isUser: boolean) {
-    if (!email) throw new ForbiddenException('Email is required');
+    if (!email) throw new ForbiddenException('email_is_required');
 
     if (isUser) {
       const existUser = await this.userModel.findOne({ email });
-      if (!existUser) throw new UnauthorizedException('User not found with this email!');
+      if (!existUser) throw new UnauthorizedException('user_not_found');
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
@@ -56,18 +56,18 @@ export class MailService {
   }
 
   async verifyOtp(email: string, otpVerification: string) {
-    if (!otpVerification) throw new BadRequestException('Please provide OTP Verification Code!');
+    if (!otpVerification) throw new BadRequestException('send_otp_verification');
 
     const userExistOtp = await this.otpModel.find({ email });
     const { expiresAt, otp } = userExistOtp.slice(-1)[0];
 
     if (expiresAt < new Date()) {
       await this.otpModel.deleteMany({ email });
-      throw new BadRequestException('Expired OTP code, please try again!');
+      throw new BadRequestException('expired_code');
     }
 
     const validOtp = await compare(otpVerification, otp);
-    if (!validOtp) throw new BadRequestException('Invalid OTP code, please try again!');
+    if (!validOtp) throw new BadRequestException('otp_is_incorrect');
 
     await this.otpModel.deleteMany({ email });
     return 'success';
