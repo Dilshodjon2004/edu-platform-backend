@@ -8,7 +8,15 @@ import { Model } from 'mongoose';
 export class CourseService {
   constructor(@InjectModel(Course.name) private courseModel: Model<CourseDocument>) {}
   async createCourse(dto: CourseBodyDto, _id: string) {
-    return await this.courseModel.create({ ...dto, author: _id });
+    const slugify = (str: string) =>
+      str
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    const slug = slugify(dto.title);
+    return await this.courseModel.create({ ...dto, slug: slug, author: _id });
   }
 
   async editCourse(dto: CourseBodyDto, courseId: string) {

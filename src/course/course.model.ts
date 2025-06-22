@@ -12,6 +12,9 @@ export class Course {
   @Prop()
   title: string;
 
+  @Prop({ unique: true, required: true })
+  slug: string;
+
   @Prop()
   excerpt: string;
 
