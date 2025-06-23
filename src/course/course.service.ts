@@ -22,4 +22,10 @@ export class CourseService {
   async editCourse(dto: CourseBodyDto, courseId: string) {
     return await this.courseModel.findByIdAndUpdate(courseId, dto, { new: true });
   }
+
+  async deleteCourse(courseId: string) {
+    await this.courseModel.findByIdAndDelete(courseId);
+
+    return 'success';
+  }
 }
