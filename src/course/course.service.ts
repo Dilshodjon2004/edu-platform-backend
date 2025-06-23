@@ -25,7 +25,20 @@ export class CourseService {
 
   async deleteCourse(courseId: string) {
     await this.courseModel.findByIdAndDelete(courseId);
+    return 'success';
+  }
 
+  async activateCourse(courseId: string) {
+    await this.courseModel.findByIdAndUpdate(courseId, { $set: { isActive: true } }, { new: true });
+    return 'success';
+  }
+
+  async draftCourse(courseId: string) {
+    await this.courseModel.findByIdAndUpdate(
+      courseId,
+      { $set: { isActive: false } },
+      { new: true },
+    );
     return 'success';
   }
 }

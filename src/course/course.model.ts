@@ -18,6 +18,9 @@ export class Course {
   @Prop()
   excerpt: string;
 
+  @Prop({ type: Boolean, default: false })
+  isActive: boolean;
+
   @Prop([String])
   learn: string[];
 
