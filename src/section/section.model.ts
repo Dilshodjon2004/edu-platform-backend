@@ -9,7 +9,7 @@ export class Section {
   @Prop()
   title: string;
 
-  @Prop({ type: SchemaMS.Types.ObjectId, ref: 'Lesson' })
+  @Prop([{ type: SchemaMS.Types.ObjectId, ref: 'Lesson' }])
   lessons: Lesson[];
 }
 

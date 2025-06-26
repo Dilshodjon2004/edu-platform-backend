@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { SectionDto } from './dto/section.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Section } from './section.model';
 import { Course } from 'src/course/course.model';
+import { SectionDto } from './dto/section.dto';
+import { Section } from './section.model';
 
 @Injectable()
 export class SectionService {
