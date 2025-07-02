@@ -35,11 +35,9 @@ export class LessonService {
 
   async deleteLesson(sectionId: string, lessonId: string) {
     await this.lessonModel.findByIdAndDelete(lessonId);
-    const section = this.sectionModel.findByIdAndUpdate(
-      sectionId,
-      { $pull: { lessons: lessonId } },
-      { new: true },
-    );
+    const section = this.sectionModel
+      .findByIdAndUpdate(sectionId, { $pull: { lessons: lessonId } }, { new: true })
+      .populate('lessons');
 
     return section;
   }
