@@ -41,4 +41,14 @@ export class CourseService {
     );
     return 'success';
   }
+
+  async dragCourseSections(courseId: string, sections: string[]) {
+    const course = await this.courseModel.findByIdAndUpdate(
+      courseId,
+      { $set: { sections } },
+      { new: true },
+    );
+
+    return course;
+  }
 }
