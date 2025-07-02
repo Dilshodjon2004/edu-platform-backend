@@ -48,6 +48,9 @@ export class Course {
 
   @Prop()
   previewImage: string;
+
+  @Prop()
+  language: string;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
