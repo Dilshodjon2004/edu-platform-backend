@@ -116,4 +116,8 @@ export class CourseService {
 
     return totalHour.toFixed(0);
   }
+
+  async getAllAdminCourses() {
+    return await this.courseModel.find().exec();
+  }
 }
