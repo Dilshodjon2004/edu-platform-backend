@@ -60,6 +60,7 @@ export class CourseService {
       .exec();
 
     return courses.map(course => this.getSpecificFieldCourse(course));
+    // return courses;
   }
 
   getSpecificFieldCourse(course: CourseDocument) {
