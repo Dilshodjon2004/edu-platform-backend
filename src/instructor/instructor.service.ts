@@ -14,15 +14,23 @@ export class InstructorService {
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
   ) {}
   async applyAsInstructor(dto: InstructorApplyDto) {
-    const { email, firstName, lastName, socialMedia } = dto;
+    const { email, firstName, lastName, socialMedia, job, language } = dto;
     let user: UserDocument | null;
+
     const existUser = await this.userModel.findOne({ email });
     user = existUser;
+
+    if (user) {
+      await this.userModel.findByIdAndUpdate(user._id, {
+        $set: { job, fullName: `${firstName} ${lastName}` },
+      });
+    }
+
     if (!existUser) {
       const newUser = await this.userModel.create({ ...dto, fullName: `${firstName} ${lastName}` });
       user = newUser;
     }
-    const data = { socialMedia, author: user?._id };
+    const data = { socialMedia, author: user?._id, language };
     const existInstructor = await this.instructorModel.findOne({ author: user?._id });
     if (existInstructor)
       throw new BadRequestException('Instructor with this email already exists in our system.');
@@ -54,6 +62,8 @@ export class InstructorService {
     return {
       avatar: instructor.author.avatar,
       fullName: instructor.author.fullName,
+      totalCourses: instructor.courses.length,
+      job: instructor.author.job,
     };
   }
 }
