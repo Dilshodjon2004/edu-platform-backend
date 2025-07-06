@@ -8,17 +8,9 @@ export class AdminService {
   constructor(@InjectModel(Instructor.name) private instructorModel: Model<InstructorDocument>) {}
 
   async getAllInstructors() {
-    const approvedInstructors = await this.instructorModel
-      .find({ approved: true })
-      .populate('author');
-    const appliedInstructors = await this.instructorModel
-      .find({ approved: false })
-      .populate('author');
+    const instructors = await this.instructorModel.find().populate('author').exec();
 
-    return {
-      approved: approvedInstructors.map(instructor => this.getSpecificField(instructor)),
-      applied: appliedInstructors.map(instructor => this.getSpecificField(instructor)),
-    };
+    return instructors.map(instructor => this.getSpecificField(instructor));
   }
 
   getSpecificField(instructor: InstructorDocument) {
