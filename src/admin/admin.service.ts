@@ -49,6 +49,12 @@ export class AdminService {
     return 'success';
   }
 
+  async getAllUsers(limit: number) {
+    const users = await this.userModel.find().limit(limit).sort({ createdAt: -1 }).exec();
+
+    return users.map(user => this.getUserSpecificField(user));
+  }
+
   getSpecificField(instructor: InstructorDocument) {
     return {
       _id: instructor._id,
@@ -59,6 +65,16 @@ export class AdminService {
         email: instructor.author.email,
         job: instructor.author.job,
       },
+    };
+  }
+
+  getUserSpecificField(user: UserDocument) {
+    return {
+      _id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      createdAt: user.createdAt,
     };
   }
 }
