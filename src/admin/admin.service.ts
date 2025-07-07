@@ -55,6 +55,20 @@ export class AdminService {
     return users.map(user => this.getUserSpecificField(user));
   }
 
+  async searchUsers(email: string, limit: number) {
+    let users: UserDocument[];
+    if (email) {
+      users = await this.userModel.find().exec();
+    } else {
+      users = await this.userModel.find().limit(limit).exec();
+    }
+    const searchedUsers = users.filter(
+      user => user.email.toLowerCase().indexOf(email.toLowerCase()) !== -1,
+    );
+
+    return searchedUsers.map(user => this.getUserSpecificField(user));
+  }
+
   getSpecificField(instructor: InstructorDocument) {
     return {
       _id: instructor._id,

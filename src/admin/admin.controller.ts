@@ -34,4 +34,11 @@ export class AdminController {
   async getAllUsers(@Query('limit') limit: string) {
     return this.adminService.getAllUsers(Number(limit));
   }
+
+  @HttpCode(200)
+  @Get('search-users')
+  @Auth('ADMIN')
+  async searchUsers(@Query('email') email: string, @Query('limit') limit: string) {
+    return this.adminService.searchUsers(email, Number(limit));
+  }
 }
