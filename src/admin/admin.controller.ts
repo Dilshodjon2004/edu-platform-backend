@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Put, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ApproveInstructorDto } from './dto/admin.dto';
@@ -40,5 +40,12 @@ export class AdminController {
   @Auth('ADMIN')
   async searchUsers(@Query('email') email: string, @Query('limit') limit: string) {
     return this.adminService.searchUsers(email, Number(limit));
+  }
+
+  @HttpCode(200)
+  @Delete('delete-course')
+  @Auth('ADMIN')
+  async deleteCourse(@Query('courseId') courseId: string) {
+    return this.adminService.deleteCourse(courseId);
   }
 }

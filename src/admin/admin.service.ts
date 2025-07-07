@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Course, CourseDocument } from 'src/course/course.model';
 import { Instructor, InstructorDocument } from 'src/instructor/instructor.model';
 import { User, UserDocument } from 'src/user/user.model';
 
@@ -9,6 +10,7 @@ export class AdminService {
   constructor(
     @InjectModel(Instructor.name) private instructorModel: Model<InstructorDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
   ) {}
 
   async getAllInstructors() {
@@ -69,6 +71,18 @@ export class AdminService {
     return searchedUsers.map(user => this.getUserSpecificField(user));
   }
 
+  async deleteCourse(courseId: string) {
+    const courseAuthor = await this.courseModel.findById(courseId);
+    await this.instructorModel.findOneAndUpdate(
+      { author: courseAuthor?.author },
+      { $pull: { courses: courseId } },
+      { new: true },
+    );
+    await this.courseModel.findByIdAndDelete(courseId, { new: true });
+    const courses = await this.courseModel.find().exec();
+    return courses.map(course => this.getCourseSpecificField(course));
+  }
+
   getSpecificField(instructor: InstructorDocument) {
     return {
       _id: instructor._id,
@@ -89,6 +103,16 @@ export class AdminService {
       fullName: user.fullName,
       role: user.role,
       createdAt: user.createdAt,
+    };
+  }
+  getCourseSpecificField(course: CourseDocument) {
+    return {
+      title: course.title,
+      previewImage: course.previewImage,
+      price: course.price,
+      isActive: course.isActive,
+      language: course.language,
+      _id: course._id,
     };
   }
 }
