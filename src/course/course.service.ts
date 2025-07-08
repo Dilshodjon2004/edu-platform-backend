@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CourseBodyDto } from './dto/course.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Course, CourseDocument } from './course.model';
 import { Model } from 'mongoose';
 import { Instructor, InstructorDocument } from 'src/instructor/instructor.model';
+import { Course, CourseDocument } from './course.model';
+import { CourseBodyDto } from './dto/course.dto';
 
 @Injectable()
 export class CourseService {
@@ -22,7 +22,7 @@ export class CourseService {
         .replace(/^-+|-+$/g, '');
     const slug = slugify(dto.title);
     const course = await this.courseModel.create({ ...dto, slug: slug, author: _id });
-    await this.instructorModel.findByIdAndUpdate(
+    await this.instructorModel.findOneAndUpdate(
       { author: _id },
       { $push: { courses: course._id } },
       { new: true },
