@@ -20,5 +20,6 @@ export const STRIPE = 'STRIPE';
       },
     },
   ],
+  exports: ['STRIPE'],
 })
 export class PaymentModule {}
