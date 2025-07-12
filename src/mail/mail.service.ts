@@ -12,6 +12,7 @@ import * as nodemailer from 'nodemailer';
 import { Otp, OtpDocument } from './otp.model';
 import { User, UserDocument } from 'src/user/user.model';
 import { compare, genSalt, hash } from 'bcryptjs';
+import { Books, BooksDocument } from 'src/books/books.model';
 @Injectable()
 export class MailService {
   private transporter;
@@ -20,6 +21,7 @@ export class MailService {
     private readonly configService: ConfigService,
     @InjectModel(Otp.name) private otpModel: Model<OtpDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Books.name) private booksModel: Model<BooksDocument>,
   ) {
     this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('SMTP_HOST'),
@@ -70,6 +72,23 @@ export class MailService {
     if (!validOtp) throw new BadRequestException('otp_is_incorrect');
 
     await this.otpModel.deleteMany({ email });
+    return 'success';
+  }
+
+  async receiveBooks(bookId: string, userId: string) {
+    const user = await this.userModel.findById(userId);
+    const book = await this.booksModel.findById(bookId);
+
+    const emailData = {
+      to: user?.email,
+      subject: 'Ordered Book',
+      from: 'dilshodjongulomov53@gmail.com',
+      html: `
+        <a href="${book?.pdf}">Your ordered book - ${book?.title}</a>`,
+    };
+
+    await this.transporter.sendMail(emailData);
+
     return 'success';
   }
 }

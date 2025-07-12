@@ -39,4 +39,14 @@ export class CustomerService {
     const customer = await this.stripeClient.customers.retrieve(user.customerId);
     return customer;
   }
+
+  async attachPaymentMethod(paymentMethod: string, userID: string) {
+    const customer = await this.getCustomer(userID);
+
+    const attachedCard = await this.stripeClient.paymentMethods.attach(paymentMethod, {
+      customer: customer.id,
+    });
+
+    return attachedCard;
+  }
 }

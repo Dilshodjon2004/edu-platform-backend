@@ -1,13 +1,21 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import Stripe from 'stripe';
+import { CustomerService } from 'src/customer/customer.service';
+import { CustomerModule } from 'src/customer/customer.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from 'src/user/user.model';
 
 export const STRIPE = 'STRIPE';
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  imports: [
+    ConfigModule.forRoot(),
+    forwardRef(() => CustomerModule),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+  ],
   controllers: [PaymentController],
   providers: [
     PaymentService,
@@ -19,6 +27,7 @@ export const STRIPE = 'STRIPE';
         });
       },
     },
+    CustomerService,
   ],
   exports: ['STRIPE'],
 })

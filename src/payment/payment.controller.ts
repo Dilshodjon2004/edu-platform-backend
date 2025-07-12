@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { PaymentBooksDto } from './dto/payment-books.dto';
+import { User } from 'src/user/decorators/user.decorator';
 
 @Controller('payment')
 export class PaymentController {
@@ -10,7 +11,7 @@ export class PaymentController {
   @HttpCode(200)
   @Post('books')
   @Auth('USER')
-  paymentBooks(@Body() dto: PaymentBooksDto) {
-    return this.paymentService.paymentBooks(dto.price);
+  paymentBooks(@Body() dto: PaymentBooksDto, @User('_id') _id: string) {
+    return this.paymentService.paymentBooks(dto, _id);
   }
 }
