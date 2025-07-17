@@ -18,7 +18,7 @@ export class PaymentService {
       amount: body.price * 100,
       currency: 'usd',
       payment_method: card.id,
-      customer: customer.id,
+      customer: String(customer.id),
     });
 
     return paymentIntent.client_secret;
