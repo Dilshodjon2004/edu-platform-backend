@@ -80,9 +80,11 @@ export class CourseService {
 
   getSpecificFieldCourse(course: CourseDocument) {
     return {
+      _id: course._id,
       title: course.title,
       previewImage: course.previewImage,
       price: course.price,
+      category: course.category,
       level: course.level,
       author: {
         fullName: course.author.fullName,
