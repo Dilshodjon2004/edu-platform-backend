@@ -1,17 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Course, CourseDocument } from 'src/course/course.model';
 import { Instructor, InstructorDocument } from 'src/instructor/instructor.model';
 import { User, UserDocument } from 'src/user/user.model';
+import Stripe from 'stripe';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AdminService {
+  private transporter;
   constructor(
+    private readonly configService: ConfigService,
     @InjectModel(Instructor.name) private instructorModel: Model<InstructorDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
-  ) {}
+    @Inject('STRIPE') private readonly stripeClient: Stripe,
+  ) {
+    this.transporter = nodemailer.createTransport({
+      host: this.configService.get<string>('SMTP_HOST'),
+      port: this.configService.get<number>('SMTP_PORT'),
+      secure: false,
+      auth: {
+        user: this.configService.get<string>('SMTP_USER'),
+        pass: this.configService.get<string>('SMTP_PASSWORD'),
+      },
+    });
+  }
 
   async getAllInstructors() {
     const instructors = await this.instructorModel.find().populate('author').exec();
@@ -26,11 +42,42 @@ export class AdminService {
       { new: true },
     );
 
+    const user = await this.userModel.findById(instructor?.author);
+
+    const account = await this.stripeClient.accounts.create({
+      type: 'express',
+      country: 'US',
+      email: user?.email,
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+    });
+
+    const accountLinks = await this.stripeClient.accountLinks.create({
+      account: account.id,
+      refresh_url: 'http://localhost:3000',
+      return_url: 'http://localhost:3000',
+      type: 'account_onboarding',
+    });
+
     await this.userModel.findByIdAndUpdate(
       instructor?.author,
-      { $set: { role: 'INSTRUCTOR' } },
+      { $set: { role: 'INSTRUCTOR', instructorAccountId: account.id } },
       { new: true },
     );
+
+    const emailData = {
+      to: user?.email,
+      subject: 'Successfully approved',
+      from: 'no-reply@sammi.ac',
+      html: `
+        <p>Hi dear ${user?.fullName}, you approved to our platform like Instructor, follow the bellow steps.</p>
+				<a href="${accountLinks.url}">Full finish your instructor account</a>
+			`,
+    };
+
+    await this.transporter.sendMail(emailData);
 
     return 'success';
   }

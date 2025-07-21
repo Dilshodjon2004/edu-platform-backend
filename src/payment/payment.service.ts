@@ -2,12 +2,17 @@ import { Injectable, Inject } from '@nestjs/common';
 import Stripe from 'stripe';
 import { PaymentBooksDto } from './dto/payment-books.dto';
 import { CustomerService } from 'src/customer/customer.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Course, CourseDocument } from 'src/course/course.model';
+import { Model } from 'mongoose';
+import { PaymentCourseDto } from './dto/payment-courses.dto';
 
 @Injectable()
 export class PaymentService {
   constructor(
     @Inject('STRIPE') private readonly stripeClient: Stripe,
     private readonly customerService: CustomerService,
+    @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
   ) {}
 
   async paymentBooks(body: PaymentBooksDto, userID: string): Promise<string | null> {
@@ -19,6 +24,27 @@ export class PaymentService {
       currency: 'usd',
       payment_method: card.id,
       customer: String(customer.id),
+    });
+
+    return paymentIntent.client_secret;
+  }
+
+  async paymentCourses(body: PaymentCourseDto, userID: string): Promise<string | null> {
+    const customer = await this.customerService.getCustomer(userID);
+    const card = await this.customerService.attachPaymentMethod(body.paymentMethod, userID);
+    const course = await this.courseModel.findById(body.courseId).populate('author');
+
+    const feePrice = (30 / 100) * body.price;
+
+    const paymentIntent = await this.stripeClient.paymentIntents.create({
+      amount: body.price * 100,
+      currency: 'usd',
+      payment_method: card.id,
+      customer: customer.id,
+      application_fee_amount: feePrice * 100,
+      transfer_data: {
+        destination: String(course?.author.instructorAccountId),
+      },
     });
 
     return paymentIntent.client_secret;

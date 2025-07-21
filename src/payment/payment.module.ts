@@ -7,6 +7,7 @@ import { CustomerService } from 'src/customer/customer.service';
 import { CustomerModule } from 'src/customer/customer.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/user/user.model';
+import { Course, CourseSchema } from 'src/course/course.model';
 
 export const STRIPE = 'STRIPE';
 
@@ -14,7 +15,10 @@ export const STRIPE = 'STRIPE';
   imports: [
     ConfigModule.forRoot(),
     forwardRef(() => CustomerModule),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Course.name, schema: CourseSchema },
+    ]),
   ],
   controllers: [PaymentController],
   providers: [
