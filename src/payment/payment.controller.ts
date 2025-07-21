@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { PaymentBooksDto } from './dto/payment-books.dto';
@@ -21,5 +21,11 @@ export class PaymentController {
   @Auth('USER')
   paymentCourses(@Body() dto: PaymentCourseDto, @User('_id') _id: string) {
     return this.paymentService.paymentCourses(dto, _id);
+  }
+
+  @HttpCode(200)
+  @Get('list-products')
+  listProducts() {
+    return this.paymentService.listProducts();
   }
 }

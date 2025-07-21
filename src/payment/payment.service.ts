@@ -49,4 +49,12 @@ export class PaymentService {
 
     return paymentIntent.client_secret;
   }
+
+  async listProducts() {
+    const products = await this.stripeClient.products.list({
+      limit: 3,
+      expand: ['data.default_price'],
+    });
+    return products.data;
+  }
 }
