@@ -69,10 +69,9 @@ export class PaymentService {
       payment_behavior: 'default_incomplete',
       expand: ['latest_invoice.payment_intent'],
       default_payment_method: card.id,
+      trial_period_days: 14,
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    return subscription.latest_invoice.payment_intent.client_secret;
+    return subscription;
   }
 }
