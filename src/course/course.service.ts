@@ -4,12 +4,14 @@ import { Model } from 'mongoose';
 import { Instructor, InstructorDocument } from 'src/instructor/instructor.model';
 import { Course, CourseDocument } from './course.model';
 import { CourseBodyDto } from './dto/course.dto';
+import { User, UserDocument } from 'src/user/user.model';
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
     @InjectModel(Instructor.name) private instructorModel: Model<InstructorDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async createCourse(dto: CourseBodyDto, _id: string) {
@@ -139,5 +141,11 @@ export class CourseService {
 
   async getAllAdminCourses() {
     return await this.courseModel.find().exec();
+  }
+
+  async enrollUser(userID: string, courseId: string) {
+    await this.userModel.findByIdAndUpdate(userID, { $push: { courses: courseId } }, { new: true });
+
+    return 'Success';
   }
 }
