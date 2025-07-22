@@ -78,6 +78,16 @@ export class CourseService {
     return courses.map(course => this.getSpecificFieldCourse(course));
   }
 
+  async getDetailedCourse(slug: string) {
+    const course = await this.courseModel
+      .findOne({ slug })
+      .populate({ path: 'sections', populate: { path: 'lessons' } })
+      .populate('author')
+      .exec();
+
+    return course && this.getSpecificFieldCourse(course);
+  }
+
   getSpecificFieldCourse(course: CourseDocument) {
     return {
       _id: course._id,
@@ -89,9 +99,17 @@ export class CourseService {
       author: {
         fullName: course.author.fullName,
         avatar: course.author.avatar,
+        job: course.author.job,
       },
       lessonCount: course.sections.map(c => c.lessons.length).reduce((a, b) => +a + +b, 0),
       totalHour: this.getTotalHour(course),
+      updatedAt: course.updatedAt,
+      learn: course.learn,
+      requirements: course.requirements,
+      description: course.description,
+      language: course.language,
+      excerpt: course.excerpt,
+      slug: course.slug,
     };
   }
 

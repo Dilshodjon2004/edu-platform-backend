@@ -75,4 +75,10 @@ export class CourseController {
   async GetAllAdminCourses() {
     return this.courseService.getAllAdminCourses();
   }
+
+  @HttpCode(200)
+  @Get('detailed-course/:slug')
+  getDetailedCourse(@Param('slug') slug: string) {
+    return this.courseService.getDetailedCourse(slug);
+  }
 }
