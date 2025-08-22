@@ -7,6 +7,9 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
+  equals(user: string): unknown {
+    throw new Error('Method not implemented.')
+  }
   @Prop({ unique: true, required: true })
   email: string;
 

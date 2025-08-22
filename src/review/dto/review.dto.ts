@@ -9,3 +9,8 @@ export class EditReviewDto {
   summary: string;
   rating: string;
 }
+
+export class GetByUserDto {
+  course: string;
+  user: string;
+}
