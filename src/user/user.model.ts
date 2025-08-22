@@ -7,9 +7,6 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
-  equals(user: string): unknown {
-    throw new Error('Method not implemented.')
-  }
   @Prop({ unique: true, required: true })
   email: string;
 
@@ -36,6 +33,12 @@ export class User {
 
   @Prop()
   createdAt: string;
+
+  @Prop()
+  bio: string;
+
+  @Prop()
+  birthday: string;
 
   @Prop([{ type: SchemaMS.Types.ObjectId, ref: 'Course' }])
   courses: Course[];

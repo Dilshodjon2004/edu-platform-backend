@@ -7,3 +7,12 @@ export interface IEmailAndPassword {
   email: string;
   password: string;
 }
+
+export class UpdateUserDto {
+  firstName: string;
+  lastName: string;
+  birthday: string;
+  job: string;
+  bio: string;
+  avatar: string;
+}

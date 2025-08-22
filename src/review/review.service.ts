@@ -42,7 +42,8 @@ export class ReviewService {
 
   async getByUser({ course, user }: GetByUserDto) {
     const reviews = await this.reviewModel.find({ course }).exec();
-    const isExist = reviews.find(c => c.author?.equals(user));
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    const isExist = reviews.find(c => String(c.author) === user);
 
     return isExist;
   }
